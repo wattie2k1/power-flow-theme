@@ -2,6 +2,10 @@
 
 Eigenes Theme für Home Assistant (getestet mit HA OS, Core 2026.11) mit card-mod-Styling für alle Dashboard-Karten.
 
+![Power Flow Dark – Beispielkacheln](images/preview-dark.png)
+
+![Power Flow Light – Beispielkacheln](images/preview-light.png)
+
 ## Enthaltene Themes
 
 | Theme | Modus | Akzent |
@@ -25,6 +29,8 @@ button-card-templates/               button-card-Templates der Dashboards
   haussteuerung.yaml                 pf_tile (Schalter-Kachel), pf_mini (kleine Aktionsbuttons)
   energie-uebersicht.yaml            pf_stat_card (Kennzahl-Karte)
 tools/gen_variants.py                erzeugt die Akzent-Varianten
+tools/make_preview.py                erzeugt die Vorschaubilder (SVG, in images/)
+images/                              Vorschaubilder für README und HACS
 ```
 
 In der Theme-Datei gibt es die gemeinsamen Teile nur einmal, als YAML-Anker:
@@ -68,3 +74,7 @@ Die Templates installiert HACS nicht mit. Sie gehören in die Dashboard-Konfigur
 ## Varianten neu erzeugen
 
 `tools/gen_variants.py` berechnet die Akzentfarben und Primär-Skalen und schreibt `variants.yaml`. Den Block ersetzt man in der Theme-Datei ab „AKZENT-VARIANTEN“.
+
+## Lizenz
+
+MIT, siehe [LICENSE](LICENSE).

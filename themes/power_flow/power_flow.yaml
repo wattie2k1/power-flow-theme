@@ -1,0 +1,680 @@
+# =================================================================
+# Power Flow – Theme-Familie (Dark, Light, Auto), Stand 2026-11-08
+#
+# Aufbau:
+#   - card-mod-card (&pf_card_mod) und die Zuordnung HA-Variable -> Palette
+#     (&pf_map) gibt es nur EINMAL; beide Themes nutzen sie gemeinsam.
+#   - Pro Theme steht nur die Farbpalette (pf-*). Neue Farben immer als
+#     pf-Variable in BEIDEN Paletten anlegen und in pf_map verwenden.
+#   - Jedes Theme hat genau einen Modus => HA rendert es immer in diesem
+#     Modus (Diagramme, Karte, Code-Editor, Dialoge passen sich an).
+# =================================================================
+
+"Power Flow Dark":
+  card-mod-theme: "Power Flow Dark"
+
+  # card-mod-card wirkt in JEDER Dashboard-Karte (nicht in den Einstellungen)
+  card-mod-card: &pf_card_mod |
+    ha-card {
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      /* Ziffern gleich breit: wechselnde Werte (W, ct, %) springen nicht */
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Sichtbarer Tastatur-Fokus (Tab-Navigation), passend zum Hover */
+    ha-card:focus-visible,
+    :host(:focus-visible) ha-card {
+      outline: 2px solid var(--pf-accent) !important;
+      outline-offset: 2px;
+    }
+
+    /* "Bewegung reduzieren" am Gerät: Animationen und Übergänge aus
+       (Puls-Icons, Batterie-Welle, Hover-Übergang) */
+    @media (prefers-reduced-motion: reduce) {
+      ha-card, ha-card * {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+
+    /* Hover-Glow nur auf Geräten mit echter Maus (kein "Hängenbleiben" auf Touch).
+       ":host(*) ha-card:hover" ist bewusst spezifischer als die Kartentyp-Regeln
+       (":host(price-timeline-card) ha-card" usw.), damit der Hover bei JEDER Karte gewinnt. */
+    @media (hover: hover) {
+      :host(*) ha-card:hover,
+      ha-card:hover {
+        border-color: var(--pf-accent) !important;
+        box-shadow: var(--pf-hover-shadow), 0 0 10px rgba(var(--rgb-primary-color), 0.25) !important;
+      }
+      /* Ausnahmen ohne Hover: Überschriften (auch leere Abstands-Überschriften).
+         Spezifischer als ":host(*) ha-card:hover", daher gewinnt diese Regel. */
+      :host(hui-heading-card) ha-card:hover {
+        border-color: transparent !important;
+        box-shadow: none !important;
+      }
+    }
+
+    /* ---------------------------------------------------------------
+       Standard-Kartenlook erzwingen für HACS-Karten, die eigene
+       Hintergründe/Rahmen setzen. Direkt über den Kartentyp (:host(...)),
+       die Karten brauchen dafür KEINEN card_mod-Eintrag.
+       Für weitere Karten: Typ hier ergänzen oder card_mod: {class: pf-card}
+       --------------------------------------------------------------- */
+    :host(power-flow-card-plus) ha-card,
+    :host(price-timeline-card) ha-card,
+    ha-card.pf-card {
+      background-color: var(--card-background-color) !important;
+      border-radius: var(--ha-card-border-radius, 16px) !important;
+      border: var(--ha-card-border-width, 1px) solid var(--ha-card-border-color) !important;
+      box-shadow: var(--ha-card-box-shadow) !important;
+    }
+    /* price-timeline-card (Kartenoption theme: theme): Preisfarben aus der Palette.
+       !important nötig, weil die Karte die Variablen inline am Element setzt. */
+    :host(price-timeline-card) {
+      --orange: var(--pf-price-high) !important;
+      --turquoise: var(--pf-price-low) !important;
+      --no-data-line: var(--pf-price-high) !important;
+    }
+    /* price-timeline-card: Heute/Morgen-Schalter – Hintergrund und inaktiver Text aus der Palette */
+    :host(price-timeline-card) .day-toggle .toggle-button {
+      background: rgba(var(--pf-overlay-rgb), 0.08) !important;
+    }
+    :host(price-timeline-card) .toggle-button.active-today span.tomorrow,
+    :host(price-timeline-card) .toggle-button.active-tomorrow span.today {
+      color: var(--pf-on-subtle) !important;
+    }
+    /* solar-bar-card: Beschriftung auf den Balken (z. B. "0.0 %") */
+    :host(solar-bar-card) .bar-overlay-label {
+      color: var(--pf-on-subtle) !important;
+      text-shadow: var(--pf-text-shadow) !important;
+    }
+    /* power-flow-card-plus: Kreise auf abgesetztem Untergrund */
+    :host(power-flow-card-plus) .circle-container .circle {
+      background-color: var(--secondary-background-color) !important;
+    }
+
+    /* ---------------------------------------------------------------
+       Klasse "pf-stat": Kennzahl-Kacheln (mini-graph-card) im Energie-Dashboard
+       Pro Karte nur noch: --pf-stat-color + Wert/Einheit/Tageswert (card_mod.style)
+       --------------------------------------------------------------- */
+    ha-card.pf-stat {
+      background: var(--card-background-color) !important;
+      border-radius: var(--ha-card-border-radius, 16px) !important;
+      padding: 16px !important;
+      height: 125px !important;
+      box-sizing: border-box !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      position: relative !important;
+    }
+    ha-card.pf-stat .header { padding-bottom: 0 !important; margin-bottom: 0 !important; }
+    ha-card.pf-stat .icon { color: var(--pf-stat-color, var(--pf-accent)) !important; width: 20px !important; height: 20px !important; }
+    ha-card.pf-stat .name { color: var(--pf-text-label) !important; font-size: 15px !important; font-weight: 500 !important; opacity: 1 !important; }
+    ha-card.pf-stat .states { display: flex !important; flex-direction: row !important; align-items: baseline !important; margin: 2px 0 0 0 !important; }
+    ha-card.pf-stat .state__value { font-size: 0 !important; }
+    ha-card.pf-stat .state__value::before { font-size: 28px !important; font-weight: bold !important; color: var(--pf-text) !important; line-height: 1.1 !important; }
+    ha-card.pf-stat .state__value::after { font-size: 18px !important; font-weight: 500 !important; color: var(--pf-text-secondary) !important; margin-left: 5px !important; }
+    ha-card.pf-stat .state__uom { display: none !important; }
+    ha-card.pf-stat::after {
+      position: absolute !important; top: 42px !important; right: 16px !important;
+      text-align: right !important; font-size: 12px !important; font-weight: 500 !important;
+      color: var(--pf-text-secondary) !important; white-space: nowrap !important; pointer-events: none !important;
+    }
+    ha-card.pf-stat .graph { margin-top: auto !important; padding-top: 4px !important; }
+    ha-card.pf-stat .info { margin-top: 1px !important; padding: 0 !important; }
+    ha-card.pf-stat .info__item { font-size: 11px !important; font-weight: normal !important; color: var(--pf-text-muted) !important; }
+
+    /* Kleine Aktions-Buttons in Karten (button-card Template "pf_mini") ohne Glow */
+    @media (hover: hover) {
+      ha-card.pf-mini:hover {
+        box-shadow: none !important;
+        border-color: transparent !important;
+        background: rgba(var(--pf-overlay-rgb), 0.14) !important;
+      }
+    }
+
+  modes:
+    dark: &pf_dark_mode
+      # -----------------------------------------------------------
+      # PALETTE DARK – nur hier Farben ändern
+      # -----------------------------------------------------------
+      pf-bg: '#0b1016'
+      pf-surface: '#182430'
+      pf-surface-alt: '#1c2836'
+      pf-surface-2: '#202f3e'
+      pf-surface-3: '#293b4f'
+      pf-border: '#2d3f52'
+      pf-accent: '#3b92f4'
+      pf-accent-container: '#23364c'
+      pf-on-accent-container: '#ffffff'
+      pf-green: '#31d061'
+      pf-text: '#ffffff'
+      pf-text-strong: '#e6edf3'
+      pf-text-secondary: '#a0aec0'
+      pf-text-muted: '#8d9fae'
+      pf-text-disabled: '#65788b'
+      pf-text-label: '#c4d1db'
+      pf-danger: '#e74c3c'
+      pf-warning: '#f39c12'
+      # Zusatzfarben (Energie, Zustände, Diagramme)
+      pf-yellow: '#f5b82e'
+      pf-purple: '#a77bf3'
+      pf-cyan: '#00bcd4'
+      pf-orange: '#ff7043'
+      pf-pink: '#f06292'
+      pf-teal: '#2bb5a0'
+      pf-leaf: '#4caf7d'
+      pf-gas: '#e8833a'
+      # Strompreis-Karte (price-timeline-card): teuer / günstig
+      pf-price-high: '#ff832d'
+      pf-price-low: '#1dbfac'
+      # Hover-Fläche Eingabefelder = pf-surface-2 + 8 % Weiß (wie Ripple der Auswahlfelder)
+      pf-field-hover: '#32404d'
+      # Aktiv-Farbe der Schalter-Kacheln (button-card Template "pf_tile")
+      pf-active-rgb: '255, 152, 0'
+      pf-active: 'rgb(var(--pf-active-rgb))'
+      # Überlagerungen: im Dunklen helle Schleier, im Hellen dunkle
+      pf-overlay-rgb: '255, 255, 255'
+      pf-divider: 'rgba(255, 255, 255, 0.15)'
+      pf-divider-soft: 'rgba(255, 255, 255, 0.12)'
+      pf-shadow: '0 8px 24px rgba(0, 0, 0, 0.4)'
+      pf-hover-shadow: '0 8px 28px rgba(0, 0, 0, 0.5)'
+      # Text auf dezenten Overlay-Flächen (Pillen, inaktive Schalter in HACS-Karten)
+      pf-on-subtle: '#ffffff'
+      # Textschatten für Text auf farbigen Flächen (z. B. Batterie-Prozent)
+      pf-text-shadow: '0px 1px 4px rgba(0, 0, 0, 0.9)'
+      # RGB-Varianten (müssen Zahlen sein, keine var()-Referenzen)
+      rgb-primary-color: '59, 146, 244'
+      rgb-accent-color: '49, 208, 97'
+      rgb-primary-text-color: '255, 255, 255'
+      rgb-card-background-color: '24, 36, 48'
+      # Code-Editor (Syntaxfarben sind modusabhängig)
+      codemirror-property: '#7fb8ff'
+      codemirror-attribute: '#7fb8ff'
+      codemirror-def: '#7fb8ff'
+      codemirror-keyword: '#c792ea'
+      codemirror-builtin: '#c792ea'
+      codemirror-tag: '#c792ea'
+      codemirror-string: '#9ad97a'
+      codemirror-string-2: '#2bb5a0'
+      codemirror-number: '#f5b82e'
+      codemirror-atom: '#f5b82e'
+      codemirror-qualifier: '#f5b82e'
+      codemirror-variable-2: '#82cfff'
+      codemirror-variable-3: '#ff9e64'
+      codemirror-type: '#ff9e64'
+      codemirror-comment: '#6b7d8f'
+
+      # -----------------------------------------------------------
+      # GEMEINSAME ZUORDNUNG (gilt für Dark UND Light, &pf_map)
+      # Hier nur var(--pf-…)-Verweise oder modusunabhängige Werte.
+      # -----------------------------------------------------------
+      <<: &pf_map
+        # Hintergründe
+        primary-background-color: 'var(--pf-bg)'
+        secondary-background-color: 'var(--pf-surface-alt)'
+        card-background-color: 'var(--pf-surface)'
+        ha-card-background: 'var(--pf-surface)'
+        lovelace-background: 'var(--pf-bg)'
+        ha-view-background: 'var(--pf-bg)'
+        view-background: 'var(--pf-bg)'
+        section-background-color: 'var(--pf-bg)'
+        ha-dialog-surface-background: 'var(--pf-surface)'
+        sidebar-background-color: 'var(--pf-bg)'
+        sidebar-text-color: 'var(--pf-text-secondary)'
+        sidebar-icon-color: 'var(--pf-text-muted)'
+        sidebar-selected-text-color: 'var(--pf-text)'
+        sidebar-selected-icon-color: 'var(--pf-accent)'
+        sidebar-menu-button-text-color: 'var(--pf-text)'
+        app-header-background-color: 'var(--pf-bg)'
+        app-header-text-color: 'var(--pf-text)'
+
+        # Karten
+        ha-card-border-radius: '16px'
+        ha-card-border-color: 'var(--pf-border)'
+        ha-card-border-width: '1px'
+        ha-card-box-shadow: 'var(--pf-shadow)'
+        # Abstand zwischen Karten in Raster-Karten (type: grid); HA-Standard 8px
+        grid-card-gap: '12px'
+
+        # HA-Design-Tokens (ab HA 2025): Buttons, Chips, Hinweis-Boxen, Badges,
+        # Rahmen und Flächen in Dialogen/Einstellungen leiten sich aus diesen
+        # zwei Skalen ab. Echte Tonskalen (05 = sehr dunkel … 95 = sehr hell),
+        # HA wählt je Modus selbst die passende Stufe.
+        ha-color-primary-05: '#04172f'
+        ha-color-primary-10: '#082447'
+        ha-color-primary-20: '#0e3b72'
+        ha-color-primary-30: '#16529e'
+        ha-color-primary-40: '#1f6dcd'
+        ha-color-primary-50: '#3b92f4'
+        ha-color-primary-60: '#64aaf7'
+        ha-color-primary-70: '#8fc2fa'
+        ha-color-primary-80: '#b9d9fc'
+        ha-color-primary-90: '#dceafd'
+        ha-color-primary-95: '#eef5fe'
+        ha-color-neutral-05: '#0b1016'
+        ha-color-neutral-10: '#141d27'
+        ha-color-neutral-20: '#22303e'
+        ha-color-neutral-30: '#34465a'
+        ha-color-neutral-40: '#4a5a6b'
+        ha-color-neutral-50: '#627080'
+        ha-color-neutral-60: '#8d9fae'
+        ha-color-neutral-70: '#aab7c4'
+        ha-color-neutral-80: '#c8d1db'
+        ha-color-neutral-90: '#e3e9f0'
+        ha-color-neutral-95: '#f1f4f8'
+        # Fokus-Ring (Tastatur) in Akzentfarbe statt Grau
+        ha-color-focus: 'var(--pf-accent)'
+
+        # Dialoge: Ecken wie Karten, Hintergrund leicht weichgezeichnet
+        ha-dialog-border-radius: '16px'
+        ha-dialog-scrim-backdrop-filter: 'blur(4px) brightness(68%)'
+        dialog-box-shadow: 'var(--pf-hover-shadow)'
+
+        # Text
+        primary-text-color: 'var(--pf-text)'
+        secondary-text-color: 'var(--pf-text-secondary)'
+        disabled-text-color: 'var(--pf-text-disabled)'
+
+        # Akzentfarben
+        primary-color: 'var(--pf-accent)'
+        accent-color: 'var(--pf-green)'
+        mdc-theme-primary: 'var(--pf-accent)'
+        mdc-theme-on-primary: '#ffffff'
+
+        # Material 3 Flächen & Text
+        md-sys-color-background: 'var(--pf-bg)'
+        md-sys-color-surface: 'var(--pf-bg)'
+        md-sys-color-surface-container-lowest: 'var(--pf-bg)'
+        md-sys-color-surface-container-low: 'var(--pf-bg)'
+        md-sys-color-surface-container: 'var(--pf-bg)'
+        md-sys-color-surface-container-high: 'var(--pf-surface)'
+        md-sys-color-surface-container-highest: 'var(--pf-surface-3)'
+        md-sys-color-primary: 'var(--pf-accent)'
+        md-sys-color-on-primary: '#ffffff'
+        md-sys-color-primary-container: 'var(--pf-accent-container)'
+        md-sys-color-on-primary-container: 'var(--pf-on-accent-container)'
+        md-sys-color-on-surface: 'var(--pf-text-strong)'
+        md-sys-color-on-surface-variant: 'var(--pf-text-muted)'
+        md-sys-color-outline: 'var(--pf-border)'
+        md-sys-color-outline-variant: 'var(--pf-surface-2)'
+
+        # Chips
+        md-assist-chip-container-color: 'var(--pf-surface-2)'
+        md-assist-chip-label-text-color: 'var(--pf-accent)'
+        md-assist-chip-icon-color: 'var(--pf-accent)'
+        md-assist-chip-outline-color: 'var(--pf-border)'
+
+        # Textfelder & Selects
+        md-filled-text-field-hover-state-layer-opacity: '0'
+        md-filled-text-field-container-color: 'var(--pf-surface-2)'
+        md-filled-text-field-hover-container-color: 'var(--pf-field-hover)'
+        mdc-text-field-fill-color: 'var(--pf-surface-2)'
+        mdc-text-field-ink-color: 'var(--pf-text)'
+        mdc-text-field-label-ink-color: 'var(--pf-text-muted)'
+        mdc-text-field-disabled-label-ink-color: 'var(--pf-text-disabled)'
+        mdc-text-field-hover-line-color: 'var(--pf-accent)'
+        mdc-select-fill-color: 'var(--pf-surface-2)'
+        mdc-select-ink-color: 'var(--pf-text)'
+        mdc-select-label-ink-color: 'var(--pf-text-muted)'
+        mdc-select-dropdown-icon-color: 'var(--pf-text-muted)'
+        mdc-select-outlined-idle-border-color: 'rgba(var(--pf-overlay-rgb), 0.2)'
+        mdc-select-outlined-focused-border-color: 'var(--pf-accent)'
+        ha-color-form-background: 'var(--pf-surface-2)'
+        # Hover der neuen Textfelder (ha-input / wa-input); HA-Standard wäre #4a4a4a
+        ha-color-form-background-hover: 'var(--pf-field-hover)'
+        input-dropdown-icon-color: 'var(--pf-text-muted)'
+        input-label-custom-color: 'var(--pf-text-muted)'
+        input-idle-line-color: 'var(--pf-border)'
+        input-hover-line-color: 'var(--pf-accent)'
+
+        # Tooltips
+        ha-tooltip-background-color: 'var(--pf-surface-2)'
+        ha-tooltip-text-color: 'var(--pf-text)'
+        md-plain-tooltip-container-color: 'var(--pf-surface-2)'
+        md-plain-tooltip-supporting-text-color: 'var(--pf-text)'
+
+        # Trennlinien & Diagramme
+        divider-color: 'var(--pf-divider)'
+        table-row-divider-color: 'var(--pf-divider-soft)'
+        graph-color-1: 'var(--pf-accent)'
+        graph-color-2: 'var(--pf-green)'
+        graph-color-3: 'var(--pf-yellow)'
+        graph-color-4: 'var(--pf-purple)'
+        graph-color-5: 'var(--pf-cyan)'
+        graph-color-6: 'var(--pf-orange)'
+        graph-color-7: 'var(--pf-pink)'
+        graph-color-8: 'var(--pf-text-muted)'
+
+        # Code-Editor (Flächen; Syntaxfarben stehen in der Palette)
+        code-editor-background-color: 'var(--pf-surface-2)'
+        code-editor-gutter-color: 'var(--pf-surface)'
+        codemirror-variable: 'var(--pf-text-strong)'
+        codemirror-operator: 'var(--pf-text-muted)'
+        codemirror-meta: 'var(--pf-text-muted)'
+
+        # Vacuum Card
+        vc-background: 'var(--pf-surface)'
+        vc-primary-text-color: 'var(--pf-text)'
+        vc-secondary-text-color: 'var(--pf-text-secondary)'
+        vc-icon-color: 'var(--pf-text-muted)'
+        vc-toolbar-background: 'var(--pf-surface)'
+        vc-toolbar-text-color: 'var(--pf-text-muted)'
+        vc-toolbar-icon-color: 'var(--pf-text-muted)'
+        vc-divider-color: 'var(--pf-border)'
+        vc-spacing: '12px'
+
+        # Bubble Card
+        bubble-main-background-color: 'var(--pf-surface)'
+        bubble-secondary-background-color: 'var(--pf-surface-2)'
+        bubble-accent-color: 'var(--pf-accent)'
+        bubble-icon-background-color: 'rgba(var(--pf-overlay-rgb), 0.05)'
+        bubble-border-radius: '16px'
+        bubble-border: '1px solid var(--pf-border)'
+
+        # Schalter
+        switch-checked-color: 'var(--pf-green)'
+        switch-checked-button-color: 'var(--pf-green)'
+        switch-checked-track-color: 'rgba(var(--rgb-accent-color), 0.35)'
+        switch-unchecked-color: 'var(--pf-text-disabled)'
+        switch-unchecked-button-color: 'var(--pf-text-muted)'
+        switch-unchecked-track-color: 'var(--pf-border)'
+
+        # Zustandsfarben je Gerätetyp
+        state-active-color: 'var(--pf-accent)'
+        state-icon-active-color: 'var(--pf-accent)'
+        state-light-active-color: 'var(--pf-yellow)'
+        state-switch-active-color: 'var(--pf-green)'
+        state-input_boolean-active-color: 'var(--pf-green)'
+        state-fan-active-color: 'var(--pf-cyan)'
+        state-media_player-active-color: 'var(--pf-purple)'
+        state-remote-active-color: 'var(--pf-purple)'
+        state-vacuum-active-color: 'var(--pf-accent)'
+        state-climate-heat-color: 'var(--pf-orange)'
+        state-climate-cool-color: 'var(--pf-accent)'
+        state-climate-auto-color: 'var(--pf-green)'
+
+        # Energie (Energie-Dashboard, power-flow-card-plus, Plotly per $fn)
+        energy-solar-color: 'var(--pf-yellow)'
+        energy-grid-consumption-color: 'var(--pf-accent)'
+        energy-grid-return-color: 'var(--pf-purple)'
+        energy-battery-out-color: 'var(--pf-green)'
+        energy-battery-in-color: 'var(--pf-teal)'
+        energy-non-fossil-color: 'var(--pf-leaf)'
+        energy-gas-color: 'var(--pf-gas)'
+        energy-water-color: 'var(--pf-cyan)'
+
+
+"Power Flow Light":
+  card-mod-theme: "Power Flow Light"
+  card-mod-card: *pf_card_mod
+
+  modes:
+    light: &pf_light_mode
+      # -----------------------------------------------------------
+      # PALETTE LIGHT – nur hier Farben ändern
+      # -----------------------------------------------------------
+      pf-bg: '#eef2f7'
+      pf-surface: '#ffffff'
+      pf-surface-alt: '#f3f6fa'
+      pf-surface-2: '#f1f4f8'
+      pf-surface-3: '#e3e9f0'
+      pf-border: '#d5dde7'
+      pf-accent: '#1f6dcd'
+      pf-accent-container: '#dce9fb'
+      pf-on-accent-container: '#0f3a73'
+      pf-green: '#1e9e4a'
+      pf-text: '#0f1720'
+      pf-text-strong: '#1b2633'
+      pf-text-secondary: '#4a5a6b'
+      pf-text-muted: '#627080'
+      pf-text-disabled: '#7b8ea0'
+      pf-text-label: '#2c3a48'
+      pf-danger: '#d63b2d'
+      pf-warning: '#c67a0a'
+      # Zusatzfarben (für hellen Grund etwas kräftiger/dunkler)
+      pf-yellow: '#b78200'
+      pf-purple: '#7c4dd6'
+      pf-cyan: '#0097a7'
+      pf-orange: '#f4511e'
+      pf-pink: '#d81b60'
+      pf-teal: '#00897b'
+      pf-leaf: '#2e7d32'
+      pf-gas: '#d84315'
+      pf-price-high: '#e8680f'
+      pf-price-low: '#0f9e8e'
+      # Hover-Fläche Eingabefelder = pf-surface-2 + 8 % Ripple (Textfarbe)
+      pf-field-hover: '#e4e8ed'
+      # Aktiv-Farbe der Schalter-Kacheln (etwas dunkleres Orange für Kontrast auf Weiß)
+      pf-active-rgb: '207, 117, 0'
+      pf-active: 'rgb(var(--pf-active-rgb))'
+      # Überlagerungen: im Hellen dunkle Schleier
+      pf-overlay-rgb: '15, 23, 32'
+      pf-divider: 'rgba(15, 23, 32, 0.12)'
+      pf-divider-soft: 'rgba(15, 23, 32, 0.08)'
+      pf-shadow: '0 4px 16px rgba(15, 23, 32, 0.08)'
+      pf-hover-shadow: '0 6px 20px rgba(15, 23, 32, 0.14)'
+      pf-on-subtle: '#4a5a6b'
+      pf-text-shadow: '0px 1px 3px rgba(255, 255, 255, 0.9)'
+      # RGB-Varianten
+      rgb-primary-color: '31, 109, 205'
+      rgb-accent-color: '30, 158, 74'
+      rgb-primary-text-color: '15, 23, 32'
+      rgb-card-background-color: '255, 255, 255'
+      # Code-Editor (Syntaxfarben für hellen Grund)
+      codemirror-property: '#1f63c4'
+      codemirror-attribute: '#1f63c4'
+      codemirror-def: '#1f63c4'
+      codemirror-keyword: '#8b3fd1'
+      codemirror-builtin: '#8b3fd1'
+      codemirror-tag: '#8b3fd1'
+      codemirror-string: '#1d7a35'
+      codemirror-string-2: '#00796b'
+      codemirror-number: '#b06a00'
+      codemirror-atom: '#b06a00'
+      codemirror-qualifier: '#b06a00'
+      codemirror-variable-2: '#0b6aa8'
+      codemirror-variable-3: '#c2410c'
+      codemirror-type: '#c2410c'
+      codemirror-comment: '#7b8794'
+
+      # Gemeinsame Zuordnung übernehmen
+      <<: *pf_map
+
+
+# -----------------------------------------------------------------
+# Automatischer Wechsel: hell/dunkel je nach HA-Einstellung
+# (Profil -> Design -> "Power Flow", Modus "Automatisch" folgt dem Gerät).
+# Übernimmt beide Paletten 1:1 per Verweis – hier nichts doppelt pflegen.
+# -----------------------------------------------------------------
+"Power Flow":
+  card-mod-theme: "Power Flow"
+  card-mod-card: *pf_card_mod
+  modes:
+    light: *pf_light_mode
+    dark: *pf_dark_mode
+
+# =================================================================
+# AKZENT-VARIANTEN (2026-11-09)
+# Jede Variante übernimmt die komplette Dark- bzw. Light-Palette per
+# Merge und überschreibt NUR die Akzentfarben + die Primär-Skala.
+# Die Werte haben dieselbe Leuchtdichte wie das Original-Blau, damit
+# alle Kontraste (WCAG) identisch bleiben. Erzeugt mit gen_variants.py.
+# =================================================================
+
+"Power Flow Dark Smaragd":
+  card-mod-theme: "Power Flow Dark Smaragd"
+  card-mod-card: *pf_card_mod
+  modes:
+    dark:
+      <<: *pf_dark_mode
+      pf-accent: '#17a55e'
+      pf-accent-container: '#1e3a2c'
+      pf-on-accent-container: '#ffffff'
+      rgb-primary-color: '23, 165, 94'
+      ha-color-primary-05: '#041b10'
+      ha-color-primary-10: '#082a19'
+      ha-color-primary-20: '#0e4429'
+      ha-color-primary-30: '#155f3a'
+      ha-color-primary-40: '#1d7e4d'
+      ha-color-primary-50: '#17a55e'
+      ha-color-primary-60: '#19be6c'
+      ha-color-primary-70: '#1bd97a'
+      ha-color-primary-80: '#6eedae'
+      ha-color-primary-90: '#bbf6d8'
+      ha-color-primary-95: '#dffbed'
+
+"Power Flow Light Smaragd":
+  card-mod-theme: "Power Flow Light Smaragd"
+  card-mod-card: *pf_card_mod
+  modes:
+    light:
+      <<: *pf_light_mode
+      pf-accent: '#1d7e4d'
+      pf-accent-container: '#c1f3da'
+      pf-on-accent-container: '#0e4429'
+      rgb-primary-color: '29, 126, 77'
+      ha-color-primary-05: '#041b10'
+      ha-color-primary-10: '#082a19'
+      ha-color-primary-20: '#0e4429'
+      ha-color-primary-30: '#155f3a'
+      ha-color-primary-40: '#1d7e4d'
+      ha-color-primary-50: '#17a55e'
+      ha-color-primary-60: '#19be6c'
+      ha-color-primary-70: '#1bd97a'
+      ha-color-primary-80: '#6eedae'
+      ha-color-primary-90: '#bbf6d8'
+      ha-color-primary-95: '#dffbed'
+
+"Power Flow Dark Violett":
+  card-mod-theme: "Power Flow Dark Violett"
+  card-mod-card: *pf_card_mod
+  modes:
+    dark:
+      <<: *pf_dark_mode
+      pf-accent: '#a677f7'
+      pf-accent-container: '#3d2b5d'
+      pf-on-accent-container: '#ffffff'
+      rgb-primary-color: '166, 119, 247'
+      ha-color-primary-05: '#1e0646'
+      ha-color-primary-10: '#2d0c66'
+      ha-color-primary-20: '#4814a1'
+      ha-color-primary-30: '#631eda'
+      ha-color-primary-40: '#844ce4'
+      ha-color-primary-50: '#a677f7'
+      ha-color-primary-60: '#b993f9'
+      ha-color-primary-70: '#ccb1fc'
+      ha-color-primary-80: '#dfcefd'
+      ha-color-primary-90: '#eee5fd'
+      ha-color-primary-95: '#f7f2fe'
+
+"Power Flow Light Violett":
+  card-mod-theme: "Power Flow Light Violett"
+  card-mod-card: *pf_card_mod
+  modes:
+    light:
+      <<: *pf_light_mode
+      pf-accent: '#844ce4'
+      pf-accent-container: '#ede4fc'
+      pf-on-accent-container: '#47159f'
+      rgb-primary-color: '132, 76, 228'
+      ha-color-primary-05: '#1e0646'
+      ha-color-primary-10: '#2d0c66'
+      ha-color-primary-20: '#4814a1'
+      ha-color-primary-30: '#631eda'
+      ha-color-primary-40: '#844ce4'
+      ha-color-primary-50: '#a677f7'
+      ha-color-primary-60: '#b993f9'
+      ha-color-primary-70: '#ccb1fc'
+      ha-color-primary-80: '#dfcefd'
+      ha-color-primary-90: '#eee5fd'
+      ha-color-primary-95: '#f7f2fe'
+
+"Power Flow Dark Türkis":
+  card-mod-theme: "Power Flow Dark Türkis"
+  card-mod-card: *pf_card_mod
+  modes:
+    dark:
+      <<: *pf_dark_mode
+      pf-accent: '#11a19c'
+      pf-accent-container: '#1d3938'
+      pf-on-accent-container: '#ffffff'
+      rgb-primary-color: '17, 161, 156'
+      ha-color-primary-05: '#041a19'
+      ha-color-primary-10: '#072928'
+      ha-color-primary-20: '#0c4341'
+      ha-color-primary-30: '#125d5a'
+      ha-color-primary-40: '#197b77'
+      ha-color-primary-50: '#11a19c'
+      ha-color-primary-60: '#13b9b4'
+      ha-color-primary-70: '#15d3cd'
+      ha-color-primary-80: '#3cece7'
+      ha-color-primary-90: '#acf6f3'
+      ha-color-primary-95: '#dafbfa'
+
+"Power Flow Light Türkis":
+  card-mod-theme: "Power Flow Light Türkis"
+  card-mod-card: *pf_card_mod
+  modes:
+    light:
+      <<: *pf_light_mode
+      pf-accent: '#197b77'
+      pf-accent-container: '#b7f3f1'
+      pf-on-accent-container: '#0c4240'
+      rgb-primary-color: '25, 123, 119'
+      ha-color-primary-05: '#041a19'
+      ha-color-primary-10: '#072928'
+      ha-color-primary-20: '#0c4341'
+      ha-color-primary-30: '#125d5a'
+      ha-color-primary-40: '#197b77'
+      ha-color-primary-50: '#11a19c'
+      ha-color-primary-60: '#13b9b4'
+      ha-color-primary-70: '#15d3cd'
+      ha-color-primary-80: '#3cece7'
+      ha-color-primary-90: '#acf6f3'
+      ha-color-primary-95: '#dafbfa'
+
+"Power Flow Dark Koralle":
+  card-mod-theme: "Power Flow Dark Koralle"
+  card-mod-card: *pf_card_mod
+  modes:
+    dark:
+      <<: *pf_dark_mode
+      pf-accent: '#f25e72'
+      pf-accent-container: '#53282d'
+      pf-on-accent-container: '#ffffff'
+      rgb-primary-color: '242, 94, 114'
+      ha-color-primary-05: '#33060c'
+      ha-color-primary-10: '#4b0a13'
+      ha-color-primary-20: '#77121f'
+      ha-color-primary-30: '#a21b2d'
+      ha-color-primary-40: '#d4253d'
+      ha-color-primary-50: '#f25e72'
+      ha-color-primary-60: '#f68493'
+      ha-color-primary-70: '#f9a8b3'
+      ha-color-primary-80: '#fbc9d0'
+      ha-color-primary-90: '#fde2e6'
+      ha-color-primary-95: '#fef1f3'
+
+"Power Flow Light Koralle":
+  card-mod-theme: "Power Flow Light Koralle"
+  card-mod-card: *pf_card_mod
+  modes:
+    light:
+      <<: *pf_light_mode
+      pf-accent: '#d4253d'
+      pf-accent-container: '#fbe2e5'
+      pf-on-accent-container: '#761220'
+      rgb-primary-color: '212, 37, 61'
+      ha-color-primary-05: '#33060c'
+      ha-color-primary-10: '#4b0a13'
+      ha-color-primary-20: '#77121f'
+      ha-color-primary-30: '#a21b2d'
+      ha-color-primary-40: '#d4253d'
+      ha-color-primary-50: '#f25e72'
+      ha-color-primary-60: '#f68493'
+      ha-color-primary-70: '#f9a8b3'
+      ha-color-primary-80: '#fbc9d0'
+      ha-color-primary-90: '#fde2e6'
+      ha-color-primary-95: '#fef1f3'

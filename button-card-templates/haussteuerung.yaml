@@ -1,0 +1,76 @@
+pf_tile:
+  show_state: false
+  show_label: false
+  show_last_changed: true
+  styles:
+    card:
+    - min-height: 96px
+    - height: auto
+    - border-radius: 16px
+    - padding: 14px 16px
+    - transition: background .25s ease, border-color .25s ease, box-shadow .25s ease
+    - background: '[[[ const on = !!entity && ![''off'',''power_off'',''PowerOff'',''unavailable'',''unknown''].includes(entity.state); return on ? ''linear-gradient(135deg, rgba(var(--pf-active-rgb),0.18)
+        0%, rgba(var(--pf-active-rgb),0.05) 55%, rgba(var(--pf-active-rgb),0.02) 100%), var(--card-background-color)'' : ''linear-gradient(160deg, rgba(var(--pf-overlay-rgb),0.03) 0%, rgba(var(--pf-overlay-rgb),0)
+        60%), var(--card-background-color)''; ]]]'
+    - border: '[[[ const on = !!entity && ![''off'',''power_off'',''PowerOff'',''unavailable'',''unknown''].includes(entity.state); return on ? ''1px solid rgba(var(--pf-active-rgb),0.55)'' : ''var(--ha-card-border-width,
+        1px) solid var(--ha-card-border-color)''; ]]]'
+    - box-shadow: '[[[ const on = !!entity && ![''off'',''power_off'',''PowerOff'',''unavailable'',''unknown''].includes(entity.state); return on ? ''0 0 0 1px rgba(var(--pf-active-rgb),0.06), 0 6px 22px
+        rgba(var(--pf-active-rgb),0.16)'' : ''var(--ha-card-box-shadow)''; ]]]'
+    grid:
+    - grid-template-areas: '"i n" "i l"'
+    - grid-template-columns: 48px 1fr
+    - grid-template-rows: auto auto
+    - column-gap: 12px
+    - row-gap: 4px
+    - align-items: center
+    img_cell:
+    - width: 46px
+    - height: 46px
+    - min-width: 46px
+    - border-radius: 12px
+    - box-sizing: border-box
+    - background: '[[[ const on = !!entity && ![''off'',''power_off'',''PowerOff'',''unavailable'',''unknown''].includes(entity.state); return on ? ''rgba(var(--pf-active-rgb),0.16)'' : ''rgba(var(--pf-overlay-rgb),0.09)'';
+        ]]]'
+    - border: '[[[ const on = !!entity && ![''off'',''power_off'',''PowerOff'',''unavailable'',''unknown''].includes(entity.state); return on ? ''1px solid rgba(var(--pf-active-rgb),0.35)'' : ''1px solid
+        rgba(var(--pf-overlay-rgb),0.20)''; ]]]'
+    icon:
+    - width: 24px
+    - height: 24px
+    - color: '[[[ const on = !!entity && ![''off'',''power_off'',''PowerOff'',''unavailable'',''unknown''].includes(entity.state); return on ? ''var(--pf-active)'' : ''var(--pf-text-secondary)''; ]]]'
+    name:
+    - justify-self: start
+    - align-self: end
+    - font-size: 15px
+    - font-weight: 700
+    - letter-spacing: 0.2px
+    - color: var(--primary-text-color)
+    - white-space: normal
+    - text-align: left
+    - line-height: 1.2
+    - word-break: normal
+    - overflow-wrap: break-word
+    - hyphens: auto
+    - -webkit-hyphens: auto
+    label:
+    - justify-self: start
+    - align-self: start
+    - font-size: 12px
+    - color: var(--pf-text-muted)
+    - text-align: left
+pf_mini:
+  variables:
+    select: ''
+    option: ''
+  card_mod:
+    class: pf-mini
+  styles:
+    card:
+    - background: rgba(var(--pf-overlay-rgb), 0.08)
+    - border-radius: 6px
+    - padding: 4px 8px
+    - border: none
+    - box-shadow: none
+    icon:
+    - width: 16px
+    - color: '[[[ const s = states[variables.select]; return s && s.state === variables.option ? ''var(--pf-active)'' : ''var(--pf-text-muted)''; ]]]'
+

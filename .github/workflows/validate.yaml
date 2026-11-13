@@ -14,5 +14,3 @@ jobs:
         uses: hacs/action@main
         with:
           category: theme
-          # brands gilt nur für Integrationen
-          ignore: brands

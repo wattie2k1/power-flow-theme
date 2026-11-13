@@ -19,7 +19,8 @@ Alle Akzent-Varianten haben dieselbe Leuchtdichte wie das Original-Blau, die WCA
 ## Aufbau
 
 ```
-themes/power_flow/power_flow.yaml   Theme-Datei (alle Themes)
+themes/power_flow.yaml               Theme-Datei (alle Themes), wird von HACS installiert
+hacs.json                            HACS-Beschreibung des Repos
 button-card-templates/               button-card-Templates der Dashboards
   haussteuerung.yaml                 pf_tile (Schalter-Kachel), pf_mini (kleine Aktionsbuttons)
   energie-uebersicht.yaml            pf_stat_card (Kennzahl-Karte)
@@ -38,15 +39,31 @@ Die Varianten übernehmen eine Palette per `<<:` und überschreiben nur die Akze
 
 Voraussetzungen: [card-mod](https://github.com/thomasloven/lovelace-card-mod) und für die Templates [button-card](https://github.com/custom-cards/button-card).
 
-1. `themes/power_flow/` nach `/config/themes/` kopieren.
-2. In `configuration.yaml`:
-   ```yaml
-   frontend:
-     themes: !include_dir_merge_named themes
-   ```
-3. Aktion `frontend.reload_themes` ausführen und im Profil das Theme wählen.
+In `configuration.yaml` müssen Themes aus dem Ordner `themes` geladen werden:
 
-Die button-card-Templates gehören in die Dashboard-Konfiguration unter `button_card_templates:` (Dashboard → Rohkonfiguration bearbeiten).
+```yaml
+frontend:
+  themes: !include_dir_merge_named themes
+```
+
+### Über HACS / Marketplace
+
+1. HACS (bzw. ab HA 2026.11 **Einstellungen → Marketplace**) öffnen.
+2. Menü ⋮ → **Benutzerdefinierte Repositories** (Marketplace: **Aus Link hinzufügen**), URL dieses Repos eintragen, Kategorie **Theme**.
+3. „Power Flow“ suchen und herunterladen. Die Datei landet unter `/config/themes/power_flow.yaml`.
+4. Aktion `frontend.reload_themes` ausführen und im Profil das Theme wählen.
+
+Updates erscheinen danach automatisch in HACS / im Marketplace.
+
+### Manuell
+
+`themes/power_flow.yaml` nach `/config/themes/` kopieren, dann `frontend.reload_themes` ausführen.
+
+> Nicht beide Wege gleichzeitig nutzen: Liegt die Datei doppelt unter `/config/themes/`, sind die Themes doppelt definiert.
+
+### button-card-Templates
+
+Die Templates installiert HACS nicht mit. Sie gehören in die Dashboard-Konfiguration unter `button_card_templates:` (Dashboard → Rohkonfiguration bearbeiten).
 
 ## Varianten neu erzeugen
 

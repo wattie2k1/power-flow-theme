@@ -1,10 +1,95 @@
+# Power Flow – Home Assistant Theme
+
+**English** · [Deutsch](#deutsch)
+
+A custom Home Assistant theme (tested with HA OS, Core 2026.11) with card-mod styling for every dashboard card.
+
+![Power Flow Dark – example tiles](images/preview-dark.png)
+
+![Power Flow Light – example tiles](images/preview-light.png)
+
+## Included themes
+
+| Theme | Mode | Accent |
+|---|---|---|
+| Power Flow Dark | dark | blue |
+| Power Flow Light | light | blue |
+| Power Flow | automatic (follows the device) | blue |
+| Power Flow Dark/Light Smaragd | dark / light | emerald green |
+| Power Flow Dark/Light Violett | dark / light | violet |
+| Power Flow Dark/Light Türkis | dark / light | turquoise |
+| Power Flow Dark/Light Koralle | dark / light | coral red |
+
+All accent variants have the same luminance as the original blue, so the WCAG contrast ratios stay the same.
+
+## Repository layout
+
+```
+themes/power_flow.yaml               theme file (all themes), installed by HACS
+hacs.json                            HACS metadata
+button-card-templates/               button-card templates used in the dashboards
+  haussteuerung.yaml                 pf_tile (switch tile), pf_mini (small action buttons)
+  energie-uebersicht.yaml            pf_stat_card (statistics card)
+tools/gen_variants.py                generates the accent variants
+tools/make_preview.py                generates the preview images (SVG, in images/)
+images/                              preview images for the README and HACS
+```
+
+Shared parts exist only once in the theme file, as YAML anchors:
+
+- `&pf_card_mod`: CSS applied to every dashboard card (hover, focus, rules per card type)
+- `&pf_map`: maps all HA variables to the `pf-*` palette
+- `&pf_dark_mode` / `&pf_light_mode`: the two palettes
+
+The variants take over a palette with `<<:` and only override the accent colors.
+
+## Installation
+
+Requirements: [card-mod](https://github.com/thomasloven/lovelace-card-mod), and [button-card](https://github.com/custom-cards/button-card) for the templates.
+
+`configuration.yaml` must load themes from the `themes` folder:
+
+```yaml
+frontend:
+  themes: !include_dir_merge_named themes
+```
+
+### Via HACS / Marketplace
+
+1. Open HACS (or, from HA 2026.11, **Settings → Marketplace**).
+2. Menu ⋮ → **Custom repositories** (Marketplace: **Add from link**), enter this repository's URL, category **Theme**.
+3. Search for “Power Flow” and download it. The file is placed at `/config/themes/power_flow.yaml`.
+4. Run the action `frontend.reload_themes` and pick the theme in your profile.
+
+Updates then show up automatically in HACS / the Marketplace.
+
+### Manual
+
+Copy `themes/power_flow.yaml` to `/config/themes/`, then run `frontend.reload_themes`.
+
+> Do not use both ways at once: if the file exists twice under `/config/themes/`, every theme is defined twice.
+
+### button-card templates
+
+HACS does not install the templates. Add them to the dashboard configuration under `button_card_templates:` (dashboard → edit raw configuration).
+
+## Regenerating the variants
+
+`tools/gen_variants.py` calculates the accent colors and primary scales and writes `variants.yaml`. Replace the block in the theme file starting at “AKZENT-VARIANTEN” with it.
+
+## License
+
+MIT, see [LICENSE](LICENSE).
+
+---
+
+<a id="deutsch"></a>
+
 # Power Flow – Home-Assistant-Theme
 
-Eigenes Theme für Home Assistant (getestet mit HA OS, Core 2026.11) mit card-mod-Styling für alle Dashboard-Karten.
+[English](#power-flow--home-assistant-theme) · **Deutsch**
 
-![Power Flow Dark – Beispielkacheln](images/preview-dark.png)
-
-![Power Flow Light – Beispielkacheln](images/preview-light.png)
+Eigenes Theme für Home Assistant (getestet mit HA OS, Core 2026.11) mit card-mod-Styling für alle Dashboard-Karten. Vorschaubilder siehe oben.
 
 ## Enthaltene Themes
 

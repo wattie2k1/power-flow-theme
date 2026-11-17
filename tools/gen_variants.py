@@ -26,22 +26,26 @@ out.append('''
 # AKZENT-VARIANTEN (2026-11-09)
 # Jede Variante übernimmt die komplette Dark- bzw. Light-Palette per
 # Merge und überschreibt NUR die Akzentfarben + die Primär-Skala.
+# "Power Flow <Farbe>" (ohne Dark/Light) folgt automatisch dem Gerät.
 # Die Werte haben dieselbe Leuchtdichte wie das Original-Blau, damit
 # alle Kontraste (WCAG) identisch bleiben. Erzeugt mit gen_variants.py.
 # =================================================================''')
 report=[]
 for name,hue,ss in VARIANTS:
     scale={k:match(v,hue,ss) for k,v in SCALE.items()}
+    slug=name.lower().replace('ü','ue').replace('ä','ae').replace('ö','oe')
     for mode,base,anchor in (('dark',DARK,'pf_dark_mode'),('light',LIGHT,'pf_light_mode')):
         vals={k:match(v,hue,ss) for k,v in base.items()}
         if mode=='dark': vals['pf-on-accent-container']='#ffffff'
         title=f'Power Flow {"Dark" if mode=="dark" else "Light"} {name}'
-        out.append(f'\n"{title}":\n  card-mod-theme: "{title}"\n  card-mod-card: *pf_card_mod\n  modes:\n    {mode}:\n      <<: *{anchor}')
+        out.append(f'\n"{title}":\n  card-mod-theme: "{title}"\n  card-mod-card: *pf_card_mod\n  modes:\n    {mode}: &pf_{mode}_{slug}\n      <<: *{anchor}')
         for k,v in vals.items(): out.append(f"      {k}: '{v}'")
         out.append(f"      rgb-primary-color: '{rgbtxt(vals['pf-accent'])}'")
         for k,v in scale.items(): out.append(f"      ha-color-primary-{k}: '{v}'")
         surf='#182430' if mode=='dark' else '#ffffff'
         report.append(f"{title:30} accent {vals['pf-accent']}  vs Karte {contrast(vals['pf-accent'],surf):.2f}  weiß {contrast(vals['pf-accent'],'#ffffff'):.2f}  container {vals['pf-accent-container']}")
+    title=f'Power Flow {name}'
+    out.append(f'\n"{title}":\n  card-mod-theme: "{title}"\n  card-mod-card: *pf_card_mod\n  modes:\n    light: *pf_light_{slug}\n    dark: *pf_dark_{slug}')
 open('variants.yaml','w').write('\n'.join(out)+'\n')
 print('\n'.join(report))
 print('Original Dark  vs Karte %.2f weiß %.2f'%(contrast('#3b92f4','#182430'),contrast('#3b92f4','#ffffff')))

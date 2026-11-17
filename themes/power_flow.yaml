@@ -499,6 +499,7 @@
 # AKZENT-VARIANTEN (2026-11-09)
 # Jede Variante übernimmt die komplette Dark- bzw. Light-Palette per
 # Merge und überschreibt NUR die Akzentfarben + die Primär-Skala.
+# "Power Flow <Farbe>" (ohne Dark/Light) folgt automatisch dem Gerät.
 # Die Werte haben dieselbe Leuchtdichte wie das Original-Blau, damit
 # alle Kontraste (WCAG) identisch bleiben. Erzeugt mit gen_variants.py.
 # =================================================================
@@ -507,7 +508,7 @@
   card-mod-theme: "Power Flow Dark Smaragd"
   card-mod-card: *pf_card_mod
   modes:
-    dark:
+    dark: &pf_dark_smaragd
       <<: *pf_dark_mode
       pf-accent: '#17a55e'
       pf-accent-container: '#1e3a2c'
@@ -529,7 +530,7 @@
   card-mod-theme: "Power Flow Light Smaragd"
   card-mod-card: *pf_card_mod
   modes:
-    light:
+    light: &pf_light_smaragd
       <<: *pf_light_mode
       pf-accent: '#1d7e4d'
       pf-accent-container: '#c1f3da'
@@ -547,11 +548,18 @@
       ha-color-primary-90: '#bbf6d8'
       ha-color-primary-95: '#dffbed'
 
+"Power Flow Smaragd":
+  card-mod-theme: "Power Flow Smaragd"
+  card-mod-card: *pf_card_mod
+  modes:
+    light: *pf_light_smaragd
+    dark: *pf_dark_smaragd
+
 "Power Flow Dark Violett":
   card-mod-theme: "Power Flow Dark Violett"
   card-mod-card: *pf_card_mod
   modes:
-    dark:
+    dark: &pf_dark_violett
       <<: *pf_dark_mode
       pf-accent: '#a677f7'
       pf-accent-container: '#3d2b5d'
@@ -573,7 +581,7 @@
   card-mod-theme: "Power Flow Light Violett"
   card-mod-card: *pf_card_mod
   modes:
-    light:
+    light: &pf_light_violett
       <<: *pf_light_mode
       pf-accent: '#844ce4'
       pf-accent-container: '#ede4fc'
@@ -591,11 +599,18 @@
       ha-color-primary-90: '#eee5fd'
       ha-color-primary-95: '#f7f2fe'
 
+"Power Flow Violett":
+  card-mod-theme: "Power Flow Violett"
+  card-mod-card: *pf_card_mod
+  modes:
+    light: *pf_light_violett
+    dark: *pf_dark_violett
+
 "Power Flow Dark Türkis":
   card-mod-theme: "Power Flow Dark Türkis"
   card-mod-card: *pf_card_mod
   modes:
-    dark:
+    dark: &pf_dark_tuerkis
       <<: *pf_dark_mode
       pf-accent: '#11a19c'
       pf-accent-container: '#1d3938'
@@ -617,7 +632,7 @@
   card-mod-theme: "Power Flow Light Türkis"
   card-mod-card: *pf_card_mod
   modes:
-    light:
+    light: &pf_light_tuerkis
       <<: *pf_light_mode
       pf-accent: '#197b77'
       pf-accent-container: '#b7f3f1'
@@ -635,11 +650,18 @@
       ha-color-primary-90: '#acf6f3'
       ha-color-primary-95: '#dafbfa'
 
+"Power Flow Türkis":
+  card-mod-theme: "Power Flow Türkis"
+  card-mod-card: *pf_card_mod
+  modes:
+    light: *pf_light_tuerkis
+    dark: *pf_dark_tuerkis
+
 "Power Flow Dark Koralle":
   card-mod-theme: "Power Flow Dark Koralle"
   card-mod-card: *pf_card_mod
   modes:
-    dark:
+    dark: &pf_dark_koralle
       <<: *pf_dark_mode
       pf-accent: '#f25e72'
       pf-accent-container: '#53282d'
@@ -661,7 +683,7 @@
   card-mod-theme: "Power Flow Light Koralle"
   card-mod-card: *pf_card_mod
   modes:
-    light:
+    light: &pf_light_koralle
       <<: *pf_light_mode
       pf-accent: '#d4253d'
       pf-accent-container: '#fbe2e5'
@@ -678,3 +700,10 @@
       ha-color-primary-80: '#fbc9d0'
       ha-color-primary-90: '#fde2e6'
       ha-color-primary-95: '#fef1f3'
+
+"Power Flow Koralle":
+  card-mod-theme: "Power Flow Koralle"
+  card-mod-card: *pf_card_mod
+  modes:
+    light: *pf_light_koralle
+    dark: *pf_dark_koralle

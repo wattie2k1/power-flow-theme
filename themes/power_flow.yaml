@@ -96,8 +96,11 @@
     /* ---------------------------------------------------------------
        Klasse "pf-stat": Kennzahl-Kacheln (mini-graph-card) im Energie-Dashboard
        Pro Karte nur noch: --pf-stat-color + Wert/Einheit/Tageswert (card_mod.style)
+       card-mod setzt die Klasse je nach Karte/HA-Version an die ha-card ODER an das
+       äußere Kartenelement, deshalb jede Regel mit beiden Selektoren.
        --------------------------------------------------------------- */
-    ha-card.pf-stat {
+    ha-card.pf-stat,
+    :host(.pf-stat) ha-card {
       background: var(--card-background-color) !important;
       border-radius: var(--ha-card-border-radius, 16px) !important;
       padding: 16px !important;
@@ -108,22 +111,34 @@
       justify-content: space-between !important;
       position: relative !important;
     }
-    ha-card.pf-stat .header { padding-bottom: 0 !important; margin-bottom: 0 !important; }
-    ha-card.pf-stat .icon { color: var(--pf-stat-color, var(--pf-accent)) !important; width: 20px !important; height: 20px !important; }
-    ha-card.pf-stat .name { color: var(--pf-text-label) !important; font-size: 15px !important; font-weight: 500 !important; opacity: 1 !important; }
-    ha-card.pf-stat .states { display: flex !important; flex-direction: row !important; align-items: baseline !important; margin: 2px 0 0 0 !important; }
-    ha-card.pf-stat .state__value { font-size: 0 !important; }
-    ha-card.pf-stat .state__value::before { font-size: 28px !important; font-weight: bold !important; color: var(--pf-text) !important; line-height: 1.1 !important; }
-    ha-card.pf-stat .state__value::after { font-size: 18px !important; font-weight: 500 !important; color: var(--pf-text-secondary) !important; margin-left: 5px !important; }
-    ha-card.pf-stat .state__uom { display: none !important; }
-    ha-card.pf-stat::after {
+    ha-card.pf-stat .header,
+    :host(.pf-stat) ha-card .header { padding-bottom: 0 !important; margin-bottom: 0 !important; }
+    ha-card.pf-stat .icon,
+    :host(.pf-stat) ha-card .icon { color: var(--pf-stat-color, var(--pf-accent)) !important; width: 20px !important; height: 20px !important; }
+    ha-card.pf-stat .name,
+    :host(.pf-stat) ha-card .name { color: var(--pf-text-label) !important; font-size: 15px !important; font-weight: 500 !important; opacity: 1 !important; }
+    ha-card.pf-stat .states,
+    :host(.pf-stat) ha-card .states { display: flex !important; flex-direction: row !important; align-items: baseline !important; margin: 2px 0 0 0 !important; }
+    ha-card.pf-stat .state__value,
+    :host(.pf-stat) ha-card .state__value { font-size: 0 !important; }
+    ha-card.pf-stat .state__value::before,
+    :host(.pf-stat) ha-card .state__value::before { font-size: 28px !important; font-weight: bold !important; color: var(--pf-text) !important; line-height: 1.1 !important; }
+    ha-card.pf-stat .state__value::after,
+    :host(.pf-stat) ha-card .state__value::after { font-size: 18px !important; font-weight: 500 !important; color: var(--pf-text-secondary) !important; margin-left: 5px !important; }
+    ha-card.pf-stat .state__uom,
+    :host(.pf-stat) ha-card .state__uom { display: none !important; }
+    ha-card.pf-stat::after,
+    :host(.pf-stat) ha-card::after {
       position: absolute !important; top: 42px !important; right: 16px !important;
       text-align: right !important; font-size: 12px !important; font-weight: 500 !important;
       color: var(--pf-text-secondary) !important; white-space: nowrap !important; pointer-events: none !important;
     }
-    ha-card.pf-stat .graph { margin-top: auto !important; padding-top: 4px !important; }
-    ha-card.pf-stat .info { margin-top: 1px !important; padding: 0 !important; }
-    ha-card.pf-stat .info__item { font-size: 11px !important; font-weight: normal !important; color: var(--pf-text-muted) !important; }
+    ha-card.pf-stat .graph,
+    :host(.pf-stat) ha-card .graph { margin-top: auto !important; padding-top: 4px !important; }
+    ha-card.pf-stat .info,
+    :host(.pf-stat) ha-card .info { margin-top: 1px !important; padding: 0 !important; }
+    ha-card.pf-stat .info__item,
+    :host(.pf-stat) ha-card .info__item { font-size: 11px !important; font-weight: normal !important; color: var(--pf-text-muted) !important; }
 
     /* Kleine Aktions-Buttons in Karten (button-card Template "pf_mini") ohne Glow */
     @media (hover: hover) {

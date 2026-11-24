@@ -2,6 +2,12 @@
 
 All notable changes to Power Flow are listed here.
 
+## [1.1.1] – 2026-11-24
+
+### Fixed
+
+- `pf-stat` tiles showed their value twice and lost their layout when card-mod put the class on the outer card element instead of the `ha-card`. All `pf-stat` rules now match both.
+
 ## [1.1.0] – 2026-11-17
 
 ### Added
@@ -35,6 +41,7 @@ First release.
 - button-card templates `pf_tile`, `pf_mini` and `pf_stat_card`.
 - README in English and German, MIT license, preview images.
 
+[1.1.1]: https://github.com/wattie2k1/power-flow-theme/releases/tag/v1.1.1
 [1.1.0]: https://github.com/wattie2k1/power-flow-theme/releases/tag/v1.1.0
 [1.0.1]: https://github.com/wattie2k1/power-flow-theme/releases/tag/v1.0.1
 [1.0.0]: https://github.com/wattie2k1/power-flow-theme/releases/tag/v1.0.0
